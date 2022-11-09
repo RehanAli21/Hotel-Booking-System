@@ -14,7 +14,7 @@ const router = createBrowserRouter([
 	{ path: '/reservation/:roomType', element: <Reservation /> },
 	{ path: '/admin', element: <Login /> },
 	{ path: '/admin/users', element: <Users /> },
-	{ path: '/admin/dashboard', element: <Dashboard /> },
+	{ path: '/admin/dashboard/:username', element: <Dashboard /> },
 	{ path: '/admin/checkin', element: <Checkin /> },
 	{ path: '/admin/checkout', element: <Checkout /> },
 ])

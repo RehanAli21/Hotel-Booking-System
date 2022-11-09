@@ -11,7 +11,12 @@ export const UserProvider = ({ children }) => {
 		setUserType('')
 	}
 
-	return <UserContext.Provider value={{ userName, userType, resetUser }}> {children}</UserContext.Provider>
+	const setUser = (username, usertype) => {
+		setUserName(username)
+		setUserType(usertype)
+	}
+
+	return <UserContext.Provider value={{ userName, userType, resetUser, setUser }}> {children}</UserContext.Provider>
 }
 
 export default UserContext

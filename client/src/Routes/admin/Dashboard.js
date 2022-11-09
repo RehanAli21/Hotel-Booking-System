@@ -1,14 +1,19 @@
 import React, { Fragment, useContext, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import UserContext from '../../UserContext'
 import Sidebar from './Sidebar'
 
 const Dashboard = () => {
+	const params = useParams()
 	const navigate = useNavigate()
 	const { userName, userType, resetUser } = useContext(UserContext)
 
 	useEffect(() => {
-		if (userName === '' || userType === '') navigate('/admin')
+		if (!params.username) {
+			if (userName === '' || userType === '') {
+				navigate('/admin')
+			}
+		}
 	}, [])
 
 	return (
