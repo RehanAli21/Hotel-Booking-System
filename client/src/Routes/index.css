@@ -1,0 +1,344 @@
+:root {
+	--firstColor: rgb(62, 29, 153);
+	--secondColor: rgb(67, 0, 252);
+	--thirdColor: rgb(110, 67, 230);
+	--fourthColor: rgb(153, 141, 14);
+	--fivethColor: rgb(255, 235, 0);
+}
+
+.right {
+	margin-right: 0px !important;
+	margin-left: auto !important;
+}
+
+.firstText {
+	color: var(--firstColor);
+}
+.secondText {
+	color: var(--secondColor);
+}
+.thirdText {
+	color: var(--thirdColor);
+}
+.lastText {
+	color: var(--fivethColor);
+}
+.bgfirst {
+	background-color: var(--firstColor);
+}
+.bglast {
+	background-color: var(--fivethColor);
+}
+
+.navbar {
+	background-color: var(--firstColor) !important;
+}
+nav h1 {
+	color: var(--fivethColor);
+}
+
+.nav-item {
+	margin-right: 10px !important;
+	margin-left: 10px !important;
+	font-size: 15px;
+}
+.nav-item a:hover {
+	background-color: var(--fivethColor);
+	color: var(--firstColor) !important;
+}
+
+.carousel-item > img {
+	height: 650px;
+}
+
+.carousalUpperHeader {
+	position: absolute;
+	width: auto;
+	padding: 0 !important;
+	background-color: transparent;
+	left: 0;
+	right: 0;
+	z-index: 2;
+	font-family: serif;
+}
+
+.bg-lightblack {
+	background-color: rgba(50, 50, 50, 0.05);
+}
+
+.bc-primary {
+	border-color: var(--firstColor) !important;
+}
+
+.exp i {
+	color: var(--firstColor);
+}
+
+.exp .section:hover i {
+	color: white;
+}
+
+.exp .section:hover {
+	background-color: var(--firstColor);
+	color: white;
+}
+
+.aboutus {
+	background-color: rgba(50, 50, 50, 0.05);
+	padding: 20px;
+}
+
+.about1 {
+	border: 10px solid black !important;
+	width: 100%;
+	padding: 20px;
+}
+
+.services {
+	background-image: url('../images/services.jpg');
+	color: white;
+	font-weight: bold;
+	margin: 50px 0px;
+}
+
+.services h1 {
+	margin: 50px 0px;
+}
+
+.services .card {
+	background-color: rgba(0, 0, 0, 0.3);
+	width: 100% !important;
+	padding: 30px 5vw;
+}
+
+.services .card-li {
+	text-align: left !important;
+	list-style-type: none !important;
+}
+
+.services .card:hover {
+	background-color: rgba(255, 255, 255, 0.3);
+}
+
+.gallery img {
+	width: 100%;
+	cursor: pointer;
+}
+.hoverBig {
+	transition-duration: 0.3s;
+}
+.hoverBig:hover {
+	transform: scale(1.1);
+}
+
+.img-circle {
+	border-radius: 100%;
+	transition-duration: 0.3s;
+}
+.img-circle:hover {
+	transform: scale(1.05);
+	transition-duration: 0.2s;
+}
+.ti {
+	cursor: pointer;
+}
+
+#team2,
+#team3,
+#team4 {
+	display: none;
+}
+
+footer {
+	background-image: url(../images/contact.jpg);
+	background-repeat: none;
+	background-size: cover;
+	min-height: 100vh;
+}
+
+#room button > a {
+	color: black;
+	text-decoration: none;
+}
+
+#imgveiw {
+	position: absolute !important;
+	margin: 0 !important;
+	background-color: rgba(0, 0, 0, 1);
+	width: 100%;
+	height: 100vh;
+	left: 0px;
+	z-index: 99;
+	display: none;
+}
+
+#imgveiw button {
+	float: right;
+	margin-top: 20px;
+	margin-right: 20px;
+	color: white;
+	background-color: black;
+}
+
+#imgveiw button:active {
+	transform: scale(0.9);
+}
+
+#imgveiw_img {
+	width: 70%;
+	height: 70%;
+	margin: 50px 15%;
+}
+
+.roomInfo {
+	width: 80%;
+	margin: 0px auto;
+}
+
+.c_help {
+	cursor: help;
+	transition-duration: 0.2s;
+}
+
+.c_help:hover {
+	transform: scale(1.1);
+}
+
+/* Extra small devices (phones, 600px and down) */
+@media only screen and (max-width: 600px) {
+	.carousel-item > img {
+		height: 300px;
+	}
+	.carousalUpperHeader {
+		top: 15%;
+	}
+	.carousalUpperHeader h1 {
+		font-size: 40px;
+		font-weight: bold;
+	}
+	.carousalUpperHeader h3 {
+		font-size: 30px;
+	}
+	.carousalUpperHeader p {
+		font-size: 15px;
+	}
+	.services .serivcesTitle {
+		padding-top: 0px !important;
+		margin-top: 0px !important;
+	}
+	.services .card {
+		font-size: 15px !important;
+		padding: 10px 20px !important;
+	}
+	.img-circle {
+		width: 80px;
+		height: 80px;
+	}
+
+	.rooms h4 {
+		font-size: 20px;
+	}
+}
+
+/* Small devices (portrait tablets and large phones, 600px and up) */
+@media only screen and (min-width: 600px) {
+	.carousel-item > img {
+		height: 400px;
+	}
+	.carousalUpperHeader {
+		top: 25%;
+	}
+	.carousalUpperHeader h1 {
+		font-size: 40px;
+		font-weight: bold;
+	}
+	.carousalUpperHeader h3 {
+		font-size: 30px;
+	}
+	.carousalUpperHeader p {
+		font-size: 15px;
+	}
+	.services .serivcesTitle {
+		padding-top: 0px !important;
+		margin-top: 0px !important;
+	}
+	.services .card {
+		padding: 10px 20px !important;
+	}
+	.team-div {
+		width: 100% !important;
+	}
+}
+
+/* Medium devices (landscape tablets, 768px and up) */
+@media only screen and (min-width: 768px) {
+	.carousel-item > img {
+		height: 500px;
+	}
+	.carousalUpperHeader {
+		top: 25%;
+	}
+	.carousalUpperHeader h1 {
+		font-size: 50px;
+		font-weight: bold;
+	}
+	.carousalUpperHeader h3 {
+		font-size: 40px;
+	}
+	.carousalUpperHeader p {
+		font-size: 20px;
+	}
+	.services .card {
+		font-size: 15px !important;
+		padding: 10px 20px !important;
+	}
+	.team-div {
+		width: 100% !important;
+	}
+}
+
+/* Large devices (laptops/desktops, 992px and up) */
+@media only screen and (min-width: 992px) {
+	.carousel-item > img {
+		height: 650px;
+	}
+	.carousalUpperHeader {
+		top: 30%;
+	}
+	.carousalUpperHeader h1 {
+		font-size: 60px;
+		font-weight: bold;
+	}
+	.carousalUpperHeader h3 {
+		font-size: 50px;
+	}
+	.carousalUpperHeader p {
+		font-size: 25px;
+	}
+	.services .card {
+		font-size: 18px !important;
+		padding: 20px !important;
+	}
+	footer h6 {
+		font-size: 20px;
+	}
+	footer iframe {
+		height: 600px;
+	}
+}
+
+/* Extra large devices (large laptops and desktops, 1200px and up) */
+@media only screen and (min-width: 1200px) {
+	.testimonialtext h4 {
+		font-size: 30px;
+	}
+	.testimonialtext p {
+		font-size: 25px;
+	}
+	.testimonialtext h5 {
+		font-size: 20px;
+	}
+	.testimonialtext .p2 {
+		font-size: 15px;
+	}
+}

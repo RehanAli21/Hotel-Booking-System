@@ -1,0 +1,40 @@
+:root {
+	--firstColor: rgb(62, 29, 153);
+	--secondColor: rgb(67, 0, 252);
+	--thirdColor: rgb(110, 67, 230);
+	--fourthColor: rgb(153, 141, 14);
+	--fivethColor: rgb(255, 235, 0);
+}
+
+.right {
+	margin-right: 0px !important;
+	margin-left: auto !important;
+}
+
+.firstText {
+	color: var(--firstColor);
+}
+.secondText {
+	color: var(--secondColor);
+}
+.thirdText {
+	color: var(--thirdColor);
+}
+.lastText {
+	color: var(--fivethColor);
+}
+.bgfirst {
+	background-color: var(--firstColor);
+}
+.bgsecond {
+	background-color: var(--secondColor);
+}
+.bgthird {
+	background-color: var(--thirdColor);
+}
+.bglast {
+	background-color: var(--fivethColor);
+}
+.bg-lightblack {
+	background-color: rgba(50, 50, 50, 0.05);
+}
