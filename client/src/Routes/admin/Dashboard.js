@@ -19,10 +19,10 @@ const Dashboard = () => {
 	return (
 		<Fragment>
 			<div className='w-100 bg-dark text-white m-0 mynavbar'>
-				<h2 className='text-white text-capitalize m-0 pt-3 ms-2'>USERNAME</h2>
+				<h2 className='text-white text-capitalize m-0 pt-3 ms-2'>{userName.toUpperCase()}</h2>
 			</div>
 			<div className='row text-center g-0 mypage'>
-				<Sidebar userType={userType} navigate={navigate} resetUser={resetUser} />
+				<Sidebar page='d' username={userName} userType={userType} navigate={navigate} resetUser={resetUser} />
 				<div className='col-10 bg-lightblack p-2 pt-4'>
 					<div className='container text-start mb-2'>
 						<h1>Reservations</h1>
