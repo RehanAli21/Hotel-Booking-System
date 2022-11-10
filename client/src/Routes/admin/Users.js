@@ -1,6 +1,7 @@
 import React, { Fragment, useContext, useState, useRef, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import UserContext from '../../UserContext'
+import '../s.css'
 import axios from 'axios'
 import Sidebar from './Sidebar'
 
@@ -39,10 +40,11 @@ const Users = () => {
 		axios
 			.get('http://localhost:5000/api/users')
 			.then(res => {
+				let num = 1
 				res.data.forEach(record => {
 					newRows.push(
-						<tr>
-							<td scope='col'>{record.id + 1}</td>
+						<tr key={record.id}>
+							<td scope='col'>{num}</td>
 							<td scope='col'>{record.name}</td>
 							<td scope='col'>{record.password}</td>
 							<td scope='col'>{record.type === 1 ? 'Administration' : 'Normal'}</td>
@@ -53,6 +55,7 @@ const Users = () => {
 							</td>
 						</tr>
 					)
+					num++
 				})
 
 				if (res.data.length < 1) {

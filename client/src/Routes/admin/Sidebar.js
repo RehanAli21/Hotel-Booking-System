@@ -1,5 +1,6 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
+import '../s.css'
 
 const SideBar = ({ userType, navigate, resetUser, page, username }) => {
 	const Logout = () => {
@@ -7,16 +8,16 @@ const SideBar = ({ userType, navigate, resetUser, page, username }) => {
 		navigate('/admin')
 	}
 
-	console.log('usertype: ' + userType)
-
 	return (
-		<div className='col-2 mysidebar bg-dark text-white pt-3'>
+		<div className='col-2 mysidebar bg-dark text-white pt-3' style={{ height: '100vh' }}>
 			{userType === 'admin' ? (
 				<Link
 					style={{ textDecoration: 'none' }}
 					to='/admin/users'
 					className={
-						'sidebarA w-100 p-3 text-start text-white fs-bold d-block' + page === 'u' ? ' bgthird' : ''
+						page === 'u'
+							? 'sidebarA w-100 p-3 text-start text-white fs-bold d-block bgthird'
+							: 'sidebarA w-100 p-3 text-start text-white fs-bold d-block'
 					}>
 					<p className='d-inline'>Users</p>
 				</Link>
@@ -24,14 +25,20 @@ const SideBar = ({ userType, navigate, resetUser, page, username }) => {
 			<Link
 				style={{ textDecoration: 'none' }}
 				to={'/admin/dashboard/' + username}
-				className={'sidebarA w-100 p-3 text-start text-white fs-bold d-block' + page === 'd' ? ' bgthird' : ''}>
+				className={
+					page === 'd'
+						? 'sidebarA w-100 p-3 text-start text-white fs-bold d-block bgthird'
+						: 'sidebarA w-100 p-3 text-start text-white fs-bold d-block'
+				}>
 				<p className='d-inline'>Reservations</p>
 			</Link>
 			<Link
 				style={{ textDecoration: 'none' }}
 				to='/admin/checkin'
 				className={
-					'sidebarA w-100 p-3 text-start text-white fs-bold d-block' + +page === 'ci' ? ' bgthird' : ''
+					page === 'ci'
+						? 'sidebarA w-100 p-3 text-start text-white fs-bold d-block bgthird'
+						: 'sidebarA w-100 p-3 text-start text-white fs-bold d-block'
 				}>
 				<p className='d-inline'>Checked In</p>
 			</Link>
@@ -39,7 +46,9 @@ const SideBar = ({ userType, navigate, resetUser, page, username }) => {
 				style={{ textDecoration: 'none' }}
 				to='/admin/checkout'
 				className={
-					'sidebarA w-100 p-3 text-start text-white fs-bold d-block' + +page === 'co' ? ' bgthird' : ''
+					page === 'co'
+						? 'sidebarA w-100 p-3 text-start text-white fs-bold d-block bgthird'
+						: 'sidebarA w-100 p-3 text-start text-white fs-bold d-block'
 				}>
 				<p className='d-inline'>Checked Out</p>
 			</Link>

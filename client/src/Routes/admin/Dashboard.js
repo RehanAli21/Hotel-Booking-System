@@ -2,6 +2,7 @@ import React, { Fragment, useContext, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import UserContext from '../../UserContext'
 import Sidebar from './Sidebar'
+import '../s.css'
 
 const Dashboard = () => {
 	const params = useParams()
