@@ -51,4 +51,32 @@ app.get('/api/login/:username/:password', (req, res) => {
 	return
 })
 
+app.get('/api/adduser/:username/:pass/:usertype', (req, res) => {
+	let username = req.params.username
+	let pass = req.params.pass
+	let usertype = req.params.usertype
+
+	if (username === '' || pass === '' || usertype === '') return res.send({ msg: 'error' })
+
+	let sql = `INSERT INTO users (id, name, pass, admin) VALUES('', '${username}', '${pass}', '${usertype}')`
+
+	con.query(sql, (err, result) => {
+		if (err) return res.send({ msg: 'error' })
+
+		if (result) return res.send({ msg: 'success' })
+	})
+})
+
+app.get('/api/deleteuser/:userid', (req, res) => {
+	if (req.params.userid === '') return res.send({ msg: 'error' })
+
+	let sql = `DELETE FROM users WHERE users.id = '${req.params.userid}'`
+
+	con.query(sql, (err, result) => {
+		console.log(err)
+
+		if (result) return res.send({ msg: 'success' })
+	})
+})
+
 app.listen(5000, () => console.log('server connected'))
