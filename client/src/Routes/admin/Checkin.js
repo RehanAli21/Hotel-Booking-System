@@ -1,16 +1,82 @@
-import React, { Fragment, useContext, useEffect } from 'react'
+import React, { Fragment, useContext, useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import '../s.css'
 import UserContext from '../../UserContext'
 import Sidebar from './Sidebar'
+import axios from 'axios'
 
 const Checkin = () => {
+	const [data, setData] = useState([])
 	const { userName, userType, resetUser } = useContext(UserContext)
 	const navigate = useNavigate()
 
 	useEffect(() => {
 		if (userName === '' || userType === '') navigate('/admin')
+
+		getCheckedIn()
 	}, [])
+
+	const addCheckOut = id => {
+		axios
+			.get(`http://localhost:5000/api/addcheckout/${id}`)
+			.then(res => {
+				if (res.data.msg === 'error') alert('Something went Wrong!')
+
+				if (res.data.msg === 'success') {
+					getCheckedIn()
+					alert('Client Checked Out.')
+				}
+			})
+			.catch(err => {
+				console.log(err)
+
+				alert('Some error occured!!!')
+			})
+	}
+
+	const getCheckedIn = () => {
+		const newRows = []
+		axios
+			.get('http://localhost:5000/api/getcheckin')
+			.then(res => {
+				let num = 1
+				res.data.forEach(record => {
+					newRows.push(
+						<tr key={num}>
+							<td scope='col'>{num}</td>
+							<td scope='col'>{record.firstname}</td>
+							<td scope='col'>{record.lastname}</td>
+							<td scope='col'>{record.email}</td>
+							<td scope='col'>{record.number}</td>
+							<td scope='col'>{record.cnic}</td>
+							<td scope='col'>{record.roomnumber}</td>
+							<td scope='col'>{record.roomtype}</td>
+							<td scope='col'>{record.checkindate}</td>
+							<td scope='col'>
+								<button onClick={() => addCheckOut(record.id)} className='btn btn-warning'>
+									Check Out
+								</button>
+							</td>
+						</tr>
+					)
+					num++
+				})
+
+				if (res.data.length < 1) {
+					newRows.push(
+						<td>
+							<tr colspan='10'>NO Check Ins</tr>
+						</td>
+					)
+				}
+
+				setData(newRows)
+			})
+			.catch(err => {
+				console.log(err)
+				alert('Something went wrong!')
+			})
+	}
 
 	return (
 		<Fragment>
@@ -40,34 +106,7 @@ const Checkin = () => {
 									<th scope='col'></th>
 								</tr>
 							</thead>
-							<tbody>
-								{/* <?php
-                        $sql = "SELECT * FROM checkedin ORDER BY checkedin.id DESC;";
-
-                        $result = mysqli_query($con, $sql);
-
-                        if ($result) {
-                            $id = 0;
-                            while ($row = mysqli_fetch_array($result)) {
-                                echo "<tr>
-                                <td scope='col'>".$id."</td>
-                                <td scope='col'>".$row['firstname']."</td>
-                                <td scope='col'>".$row['lastname']."</td>
-                                <td scope='col'>".$row['email']."</td>
-                                <td scope='col'>".$row['number']."</td>
-                                <td scope='col'>".$row['cnic']."</td>
-                                <td scope='col'>".$row['roomnumber']."</td>
-                                <td scope='col'>".$row['roomtype']."</td>
-                                <td scope='col'>".$row['checkindate']."</td>
-                                <td scope='col'><a href='addcheckout.php?eid=".$row['id']."'><button className='btn btn-warning'>Check Out</button></a></td>
-                            </tr>";
-                            $id++;
-                            }
-                        } else {
-                            echo "<td><tr colspan='10'>NO RESERVATIONS</tr></td>";
-                        }
-                    ?> */}
-							</tbody>
+							<tbody>{data}</tbody>
 						</table>
 					</div>
 				</div>

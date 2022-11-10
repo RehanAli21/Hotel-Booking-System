@@ -76,7 +76,10 @@ const Dashboard = () => {
 			.then(res => {
 				if (res.data.msg === 'error') alert('Something went Wrong!')
 
-				if (res.data.msg === 'success') alert('Client CheckedIn.')
+				if (res.data.msg === 'success') {
+					getReservations()
+					alert('Client CheckedIn.')
+				}
 			})
 			.catch(err => {
 				console.log(err)
@@ -91,7 +94,10 @@ const Dashboard = () => {
 			.then(res => {
 				if (res.data.msg === 'error') alert('Something went Wrong!')
 
-				if (res.data.msg === 'success') alert('Reservation Deleted.')
+				if (res.data.msg === 'success') {
+					getReservations()
+					alert('Reservation Deleted.')
+				}
 			})
 			.catch(err => {
 				console.log(err)
