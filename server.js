@@ -209,4 +209,14 @@ app.get('/api/addcheckout/:id', (req, res) => {
 	})
 })
 
+app.get('/api/getcheckout', (req, res) => {
+	let sql = 'SELECT * FROM checkout ORDER BY checkout.id DESC'
+
+	con.query(sql, (err, result) => {
+		if (err) res.status(400).send(err)
+
+		return res.send(result)
+	})
+})
+
 app.listen(5000, () => console.log('server connected'))

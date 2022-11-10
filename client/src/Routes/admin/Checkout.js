@@ -1,17 +1,72 @@
-import React, { Fragment, useContext, useEffect } from 'react'
+import React, { Fragment, useContext, useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import UserContext from '../../UserContext'
 import '../s.css'
+import axios from 'axios'
 import Sidebar from './Sidebar'
 import * as dayjs from 'dayjs'
 
 const Checkout = () => {
+	const [data, setData] = useState([])
 	const { userName, userType, resetUser } = useContext(UserContext)
 	const navigate = useNavigate()
 
 	useEffect(() => {
 		if (userName === '' || userType === '') navigate('/admin')
+
+		getCheckOuts()
 	}, [])
+
+	const getCheckOuts = () => {
+		const newRows = []
+		axios
+			.get('http://localhost:5000/api/getcheckout')
+			.then(res => {
+				let num = 1
+				res.data.forEach(record => {
+					newRows.push(
+						<tr key={num}>
+							<td scope='col'>{num}</td>
+							<td scope='col'>{record.firstname}</td>
+							<td scope='col'>{record.lastname}</td>
+							<td scope='col'>{record.email}</td>
+							<td scope='col'>{record.number}</td>
+							<td scope='col'>{record.cnic}</td>
+							<td scope='col'>{record.roomnumber}</td>
+							<td scope='col' id={`roomtype${record.id}`}>
+								{record.roomtype}
+							</td>
+							<td scope='col' id={`checkin${record.id}`}>
+								{record.checkindate}
+							</td>
+							<td scope='col' id={`checkout${record.id}`}>
+								{record.checkoutdate}
+							</td>
+							<td scope='col'>
+								<button onClick={() => showDateDiff(record.id)} className='btn btn-secondary'>
+									Show Bill
+								</button>
+							</td>
+						</tr>
+					)
+					num++
+				})
+
+				if (res.data.length < 1) {
+					newRows.push(
+						<td>
+							<tr colspan='11'>NO CheckOut</tr>
+						</td>
+					)
+				}
+
+				setData(newRows)
+			})
+			.catch(err => {
+				console.log(err)
+				alert('Something went wrong!')
+			})
+	}
 
 	const showDateDiff = id => {
 		let checkindate = document.getElementById(`checkin${id}`).innerText
@@ -70,6 +125,7 @@ const Checkout = () => {
 								</tr>
 							</thead>
 							<tbody>
+								{data}
 								{/* <?php
                         $sql = "SELECT * FROM checkout order by checkout.id desc;";
 
