@@ -46,8 +46,8 @@ const Users = () => {
 						<tr key={record.id}>
 							<td scope='col'>{num}</td>
 							<td scope='col'>{record.name}</td>
-							<td scope='col'>{record.password}</td>
-							<td scope='col'>{record.type === 1 ? 'Administration' : 'Normal'}</td>
+							<td scope='col'>{record.pass}</td>
+							<td scope='col'>{record.admin === 1 ? 'Administration' : 'Normal'}</td>
 							<td scope='col'>
 								<button className='btn btn-danger' onClick={() => deleteUser(record.id)}>
 									<i className='fa fa-trash me-2'></i>Delete

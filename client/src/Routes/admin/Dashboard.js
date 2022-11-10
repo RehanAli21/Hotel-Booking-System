@@ -1,10 +1,12 @@
-import React, { Fragment, useContext, useEffect } from 'react'
+import React, { Fragment, useContext, useState, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
+import axios from 'axios'
 import UserContext from '../../UserContext'
 import Sidebar from './Sidebar'
 import '../s.css'
 
 const Dashboard = () => {
+	const [data, setData] = useState([])
 	const params = useParams()
 	const navigate = useNavigate()
 	const { userName, userType, resetUser } = useContext(UserContext)
@@ -15,7 +17,88 @@ const Dashboard = () => {
 				navigate('/admin')
 			}
 		}
+
+		getReservations()
 	}, [])
+
+	const getReservations = () => {
+		const newRows = []
+		axios
+			.get('http://localhost:5000/api/reservation')
+			.then(res => {
+				let num = 1
+				res.data.forEach(record => {
+					newRows.push(
+						<tr key={num}>
+							<td scope='col'>{num}</td>
+							<td scope='col'>{record.firstname}</td>
+							<td scope='col'>{record.lastname}</td>
+							<td scope='col'>{record.email}</td>
+							<td scope='col'>{record.number}</td>
+							<td scope='col'>{record.cnic}</td>
+							<td scope='col'>{record.roomnumber}</td>
+							<td scope='col'>{record.roomtype}</td>
+							<td scope='col'>{record.checkindate}</td>
+							<td scope='col'>
+								<button onClick={() => addCheckIn(record.id)} className='btn btn-success'>
+									Check In
+								</button>
+							</td>
+							<td scope='col'>
+								<button onClick={() => deleteCheckIn(record.id)} className='btn btn-danger'>
+									Delete
+								</button>
+							</td>
+						</tr>
+					)
+					num++
+				})
+
+				if (res.data.length < 1) {
+					newRows.push(
+						<td>
+							<tr colspan='10'>NO RESERVATIONS</tr>
+						</td>
+					)
+				}
+
+				setData(newRows)
+			})
+			.catch(err => {
+				console.log(err)
+				alert('Something went wrong!')
+			})
+	}
+
+	const addCheckIn = id => {
+		axios
+			.get(`http://localhost:5000/api/addcheckin/${id}`)
+			.then(res => {
+				if (res.data.msg === 'error') alert('Something went Wrong!')
+
+				if (res.data.msg === 'success') alert('Client CheckedIn.')
+			})
+			.catch(err => {
+				console.log(err)
+
+				alert('Some error occured!!!')
+			})
+	}
+
+	const deleteCheckIn = id => {
+		axios
+			.get(`http://localhost:5000/api/deletecheckin/${id}`)
+			.then(res => {
+				if (res.data.msg === 'error') alert('Something went Wrong!')
+
+				if (res.data.msg === 'success') alert('Reservation Deleted.')
+			})
+			.catch(err => {
+				console.log(err)
+
+				alert('Some error occured!!!')
+			})
+	}
 
 	return (
 		<Fragment>
@@ -46,35 +129,7 @@ const Dashboard = () => {
 									<th scope='col'></th>
 								</tr>
 							</thead>
-							<tbody>
-								{/* <?php
-                        $sql = "SELECT * FROM roomreservation;";
-
-                        $result = mysqli_query($con, $sql);
-
-                        if ($result) {
-                            $id = 0;
-                            while ($row = mysqli_fetch_array($result)) {
-                                echo "<tr>
-                                <td scope='col'>".$id."</td>
-                                <td scope='col'>".$row['firstname']."</td>
-                                <td scope='col'>".$row['lastname']."</td>
-                                <td scope='col'>".$row['email']."</td>
-                                <td scope='col'>".$row['number']."</td>
-                                <td scope='col'>".$row['cnic']."</td>
-                                <td scope='col'>".$row['roomnumber']."</td>
-                                <td scope='col'>".$row['roomtype']."</td>
-                                <td scope='col'>".$row['checkindate']."</td>
-                                <td scope='col'><a href='addcheckin.php?eid=".$row['id']."'><button className='btn btn-success'>Check In</button></a></td>
-                                <td scope='col'><a href='deletecheckin.php?eid=".$row['id']."'><button className='btn btn-danger'>Delete</button></a></td>
-                            </tr>";
-                            $id++;
-                            }
-                        } else {
-                            echo "<td><tr colspan='10'>NO RESERVATIONS</tr></td>";
-                        }
-                    ?> */}
-							</tbody>
+							<tbody>{data}</tbody>
 						</table>
 					</div>
 				</div>

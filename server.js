@@ -24,13 +24,7 @@ app.get('/api/users', (req, res) => {
 	con.query(sql, (err, result) => {
 		if (err) res.status(400).send(err)
 
-		const data = []
-
-		result.forEach(row => {
-			data.push({ id: row.id, name: row.name, password: row.pass, type: row.admin })
-		})
-
-		return res.send(data)
+		return res.send(result)
 	})
 })
 
@@ -76,6 +70,80 @@ app.get('/api/deleteuser/:userid', (req, res) => {
 		console.log(err)
 
 		if (result) return res.send({ msg: 'success' })
+	})
+})
+
+app.get('/api/reservation', (req, res) => {
+	let sql = 'SELECT * FROM roomreservation'
+
+	con.query(sql, (err, result) => {
+		if (err) res.status(400).send(err)
+
+		return res.send(result)
+	})
+})
+
+app.get('/api/addcheckin/:id', (req, res) => {
+	if (!id || id === '') return res.send({ msg: 'error' })
+
+	let sql = `SELECT * FROM roomreservation WHERE roomreservation.id = '${req.params.id}'`
+
+	con.query(sql, (err, result) => {
+		if (err) return res.send({ msg: 'error' })
+
+		if (result && result.length > 0) {
+			const firstname = result[0].firstname
+			const lastname = result[0].lastname
+			const email = result[0].email
+			const cnic = result[0].cnic
+			const number = result[0].number
+			const roomnumber = result[0].roomnumber
+			const roomType = result[0].roomtype
+
+			// declare time variable with formate of year-month-day
+			const date = new Date()
+
+			const time = `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`
+
+			sql = `INSERT INTO checkedin (id, firstname, lastname, email, cnic, number, roomnumber, roomtype, checkindate) 
+			VALUES ('', '${firstname}', '${lastname}','${email}','${cnic}','${number}','${roomnumber}','${roomType}','${time}')`
+
+			con.query(sql, (err1, result1) => {
+				if (err1) return res.send({ msg: 'error' })
+
+				if (result1) {
+					sql = `DELETE FROM roomreservation WHERE roomreservation.id = '${req.params.id}'`
+
+					con.query(sql, (err2, result2) => {
+						if (err2) return res.send({ msg: 'error' })
+
+						if (result2) {
+							sql = `UPDATE rooms SET rooms.checkedIn = '1', rooms.reserved = NULL WHERE rooms.id = '${roomnumber}'`
+
+							con.query(sql, (err3, result3) => {
+								if (err3) return res.send({ msg: 'error' })
+
+								if (result3) return res.send({ msg: 'success' })
+							})
+						}
+					})
+				}
+			})
+		} else {
+			res.send({ msg: 'error' })
+		}
+	})
+})
+
+app.get('/api/deleltecheckin/:id', (req, res) => {
+	if (!id || id === '') return res.send({ msg: 'error' })
+
+	let sql = `DELETE FROM roomreservation WHERE roomreservation.id = '${req.params.id}'`
+
+	con.query(sql, (err, result) => {
+		if (err) return res.send({ msg: 'error' })
+
+		return res.send({ msg: 'success' })
 	})
 })
 
