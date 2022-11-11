@@ -4,7 +4,13 @@ const mysql = require('mysql')
 const cors = require('cors')
 const app = express()
 
-const con = mysql.createConnection({ host: 'localhost', user: 'root', password: '', database: 'hotel_management' })
+const con = mysql.createConnection({
+	host: 'localhost',
+	user: 'root',
+	password: '',
+	database: 'hotel_management',
+	multipleStatements: true,
+})
 
 con.connect(err => {
 	if (err) throw err
@@ -35,7 +41,7 @@ app.get('/api/login/:username/:password', (req, res) => {
 	let sql = `SELECT * FROM users WHERE name = '${username}' AND pass = '${pass}';`
 
 	con.query(sql, (err, result) => {
-		if (err) res.status(400).send(err)
+		if (err) return res.status(400).send(err)
 
 		if (result.length === 1)
 			return res.send({ successMsg: 'user found', usertype: result[0].admin == 1 ? 'admin' : 'normal' })
@@ -73,6 +79,59 @@ app.get('/api/deleteuser/:userid', (req, res) => {
 	})
 })
 
+app.get('/api/addReservation/:fn/:ln/:e/:cnic/:num/:rt/:nr/:checkin', (req, res) => {
+	const fname = req.params.fn
+	const lname = req.params.ln
+	const email = req.params.e
+	const cnic = req.params.cnic
+	const number = req.params.num
+	const roomType = req.params.rt
+	const numberofrooms = req.params.nr
+	const checkin = req.params.checkin
+
+	if (
+		fname &&
+		fname !== '' &&
+		lname &&
+		lname !== '' &&
+		email &&
+		email !== '' &&
+		cnic &&
+		cnic !== '' &&
+		number &&
+		number !== '' &&
+		roomType &&
+		roomType !== '' &&
+		numberofrooms &&
+		numberofrooms !== '' &&
+		checkin &&
+		checkin !== ''
+	) {
+		let sql = `SELECT rooms.id FROM rooms WHERE rooms.checkedIn is null and rooms.reserved is null and rooms.type = '${roomType}' LIMIT ${numberofrooms}`
+
+		con.query(sql, (err, result) => {
+			if (err) return res.send({ msg: 'error' })
+
+			if (result) {
+				result.forEach(record => {
+					let roomNumber = record.id
+
+					sql = `UPDATE rooms SET rooms.reserved='1' WHERE rooms.id = ${roomNumber};
+					INSERT INTO roomreservation (id, firstname, lastname, email, cnic, number, roomnumber, roomtype, numberofrooms, checkindate) values ('', '${fname}', '${lname}', '${email}', '${cnic}', '${number}', '${roomNumber}', '${roomType}', '${numberofrooms}', '${checkin}');`
+
+					con.query(sql, (err, results) => {
+						if (err) return res.send({ msg: 'reservation error' })
+
+						if (results) return res.send({ msg: 'success' })
+					})
+				})
+			}
+		})
+	} else {
+		return res.send({ msg: 'error' })
+	}
+})
+
 app.get('/api/reservation', (req, res) => {
 	let sql = 'SELECT * FROM roomreservation'
 
@@ -84,7 +143,7 @@ app.get('/api/reservation', (req, res) => {
 })
 
 app.get('/api/addcheckin/:id', (req, res) => {
-	if (!id || id === '') return res.send({ msg: 'error' })
+	if (!req.params.id || req.params.id === '') return res.send({ msg: 'error' })
 
 	let sql = `SELECT * FROM roomreservation WHERE roomreservation.id = '${req.params.id}'`
 
@@ -130,13 +189,13 @@ app.get('/api/addcheckin/:id', (req, res) => {
 				}
 			})
 		} else {
-			res.send({ msg: 'error' })
+			return res.send({ msg: 'error' })
 		}
 	})
 })
 
-app.get('/api/deleltecheckin/:id', (req, res) => {
-	if (!id || id === '') return res.send({ msg: 'error' })
+app.get('/api/deletecheckin/:id', (req, res) => {
+	if (!req.params.id || req.params.id === '') return res.send({ msg: 'error' })
 
 	let sql = `DELETE FROM roomreservation WHERE roomreservation.id = '${req.params.id}'`
 
@@ -158,9 +217,9 @@ app.get('/api/getcheckin', (req, res) => {
 })
 
 app.get('/api/addcheckout/:id', (req, res) => {
-	if (!id || id === '') return res.send({ msg: 'error' })
+	if (!req.params.id || req.params.id === '') return res.send({ msg: 'error' })
 
-	let sql = `SELECT * from checkedin WHERE checkedin.id = '${req.params.id}'`
+	let sql = `SELECT * FROM checkedin WHERE checkedin.id = '${req.params.id}'`
 
 	con.query(sql, (err, result) => {
 		if (err) return res.send({ msg: 'error' })
@@ -173,6 +232,7 @@ app.get('/api/addcheckout/:id', (req, res) => {
 			const number = result[0].number
 			const roomnumber = result[0].roomnumber
 			const roomType = result[0].roomtype
+			const checkindate = result[0].checkindate
 
 			// declare time variable with formate of year-month-day
 			const date = new Date()
@@ -180,7 +240,7 @@ app.get('/api/addcheckout/:id', (req, res) => {
 			const time = `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`
 
 			sql = `INSERT INTO checkout (id, firstname, lastname, email, cnic, number, roomnumber, roomtype, checkindate, checkoutdate) 
-			VALUES ('', '${firstname}', '${lastname}','${email}','${cnic}','${number}','${roomnumber}','${roomType}','${time}')`
+			VALUES ('', '${firstname}', '${lastname}','${email}','${cnic}','${number}','${roomnumber}','${roomType}','${checkindate}','${time}')`
 
 			con.query(sql, (err1, result1) => {
 				if (err1) return res.send({ msg: 'error' })

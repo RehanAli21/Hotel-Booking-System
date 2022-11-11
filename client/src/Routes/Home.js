@@ -120,7 +120,7 @@ const Home = () => {
 							</li>
 							<li className='nav-item hoverBig'>
 								<a className='nav-link active rounded-1 px-2 px-1' href='#room'>
-									Room
+									ROOM
 								</a>
 							</li>
 							<li className='nav-item hoverBig'>

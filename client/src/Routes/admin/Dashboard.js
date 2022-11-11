@@ -3,7 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import axios from 'axios'
 import UserContext from '../../UserContext'
 import Sidebar from './Sidebar'
-import '../s.css'
+import './s.css'
 
 const Dashboard = () => {
 	const [data, setData] = useState([])

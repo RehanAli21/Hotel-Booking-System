@@ -1,7 +1,7 @@
 import React, { Fragment, useContext, useState, useRef, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import UserContext from '../../UserContext'
-import '../s.css'
+import './s.css'
 import axios from 'axios'
 import Sidebar from './Sidebar'
 

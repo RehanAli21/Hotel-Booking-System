@@ -1,7 +1,7 @@
 import React, { Fragment, useContext, useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import UserContext from '../../UserContext'
-import '../s.css'
+import './s.css'
 import axios from 'axios'
 import Sidebar from './Sidebar'
 import * as dayjs from 'dayjs'
@@ -124,36 +124,7 @@ const Checkout = () => {
 									<th scope='col'></th>
 								</tr>
 							</thead>
-							<tbody>
-								{data}
-								{/* <?php
-                        $sql = "SELECT * FROM checkout order by checkout.id desc;";
-
-                        $result = mysqli_query($con, $sql);
-
-                        if ($result) {
-                            $id = 0;
-                            while ($row = mysqli_fetch_array($result)) {
-                                echo '<tr>
-                                <td scope="col">'.$id.'</td>
-                                <td scope="col">'.$row['firstname'].'</td>
-                                <td scope="col">'.$row['lastname'].'</td>
-                                <td scope="col">'.$row['email'].'</td>
-                                <td scope="col">'.$row['number'].'</td>
-                                <td scope="col">'.$row['cnic'].'</td>
-                                <td scope="col">'.$row['roomnumber'].'</td>
-                                <td scope="col" id="roomtype'.$id.'">'.$row['roomtype'].'</td>
-                                <td scope="col" id="checkin'.$id.'">'.$row['checkindate'].'</td>
-                                <td scope="col" id="checkout'.$id.'">'.$row['checkoutdate'].'</td>
-                                <td scope="col"><button className="btn btn-secondary" onClick="showDateDiff('.$id.')">Show Bill</button></td>
-                            </tr>';
-                            $id++;
-                            }
-                        } else {
-                            echo "<td><tr colspan='11'>NO CheckOut</tr></td>";
-                        }
-                    ?> */}
-							</tbody>
+							<tbody>{data}</tbody>
 						</table>
 					</div>
 				</div>
