@@ -1,85 +1,86 @@
 const express = require('express')
+const { Sequelize, DataTypes, where } = require('sequelize')
+const { User } = require('./tables/userModel')
+const { RoomReservation, Rooms } = require('./tables/roomModel')
+const { Checkedin, CheckedOut } = require('./tables/checkModel')
 const mysql = require('mysql')
 
 const cors = require('cors')
 const app = express()
 
-const con = mysql.createConnection({
+const sequelize = new Sequelize('hotel_management', 'root', '', {
 	host: 'localhost',
-	user: 'root',
-	password: '',
-	database: 'hotel_management',
-	multipleStatements: true,
+	dialect: 'mysql',
 })
 
-con.connect(err => {
-	if (err) throw err
+const UserTable = User(sequelize, DataTypes)
+const RoomsReservationTable = RoomReservation(sequelize, DataTypes)
+const RoomsTable = Rooms(sequelize, DataTypes)
+const CheckedInTable = Checkedin(sequelize, DataTypes)
+const CheckedOutTable = CheckedOut(sequelize, DataTypes)
 
-	console.log('Database connected')
-})
+try {
+	sequelize.authenticate()
+	console.log('Connection has been established successfully.')
+} catch (error) {
+	console.error('Unable to connect to the database:', error)
+}
 
 app.use(cors())
 
 app.get('/', (req, res) => {
-	res.send('Server is running')
+	return res.send('Server is running')
 })
 
-app.get('/api/users', (req, res) => {
-	let sql = 'SELECT * FROM users'
-
-	con.query(sql, (err, result) => {
-		if (err) res.status(400).send(err)
-
-		return res.send(result)
-	})
-})
-
-app.get('/api/login/:username/:password', (req, res) => {
+app.get('/api/login/:username/:password', async (req, res) => {
 	let username = req.params.username
 	let pass = req.params.password
 
-	let sql = `SELECT * FROM users WHERE name = '${username}' AND pass = '${pass}';`
+	try {
+		const user = UserTable.findOne({ username: username, password: pass })
 
-	con.query(sql, (err, result) => {
-		if (err) return res.status(400).send(err)
+		if (!user) return res.send({ msg: 'user not found' })
 
-		if (result.length === 1)
-			return res.send({ successMsg: 'user found', usertype: result[0].admin == 1 ? 'admin' : 'normal' })
-		else return res.send({ msg: 'user not found' })
-	})
-
-	return
+		return res.send({ successMsg: 'user found', usertype: user.admin == 1 ? 'admin' : 'normal' })
+	} catch (err) {
+		return res.send({ msg: 'user not found' })
+	}
 })
 
-app.get('/api/adduser/:username/:pass/:usertype', (req, res) => {
+app.get('/api/adduser/:username/:pass/:usertype', async (req, res) => {
 	let username = req.params.username
 	let pass = req.params.pass
 	let usertype = req.params.usertype
 
 	if (username === '' || pass === '' || usertype === '') return res.send({ msg: 'error' })
 
-	let sql = `INSERT INTO users (id, name, pass, admin) VALUES('', '${username}', '${pass}', '${usertype}')`
+	try {
+		await UserTable.create({
+			username: username,
+			password: pass,
+			admin: usertype,
+		})
 
-	con.query(sql, (err, result) => {
-		if (err) return res.send({ msg: 'error' })
-
-		if (result) return res.send({ msg: 'success' })
-	})
+		return res.send({ msg: 'success' })
+	} catch (err) {
+		return res.send({ msg: 'error' })
+	}
 })
 
-app.get('/api/deleteuser/:userid', (req, res) => {
+app.get('/api/deleteuser/:userid', async (req, res) => {
 	if (req.params.userid === '') return res.send({ msg: 'error' })
 
-	let sql = `DELETE FROM users WHERE users.id = '${req.params.userid}'`
+	try {
+		await UserTable.destroy({ where: { id: req.params.userid } })
 
-	con.query(sql, (err, result) => {
+		return res.send({ msg: 'success' })
+	} catch (err) {
 		console.log(err)
-
-		if (result) return res.send({ msg: 'success' })
-	})
+		return res.send({ msg: 'error' })
+	}
 })
 
-app.get('/api/addReservation/:fn/:ln/:e/:cnic/:num/:rt/:nr/:checkin', (req, res) => {
+app.get('/api/addReservation/:fn/:ln/:e/:cnic/:num/:rt/:nr/:checkin', async (req, res) => {
 	const fname = req.params.fn
 	const lname = req.params.ln
 	const email = req.params.e
@@ -107,48 +108,64 @@ app.get('/api/addReservation/:fn/:ln/:e/:cnic/:num/:rt/:nr/:checkin', (req, res)
 		checkin &&
 		checkin !== ''
 	) {
-		let sql = `SELECT rooms.id FROM rooms WHERE rooms.checkedIn is null and rooms.reserved is null and rooms.type = '${roomType}' LIMIT ${numberofrooms}`
+		let result
 
-		con.query(sql, (err, result) => {
-			if (err) return res.send({ msg: 'error' })
+		try {
+			result = await RoomsTable.findAll({
+				limit: numberofrooms,
+				where: { reserved: null, checkedIn: null, type: roomType },
+			})
+		} catch (err) {
+			return res.send({ msg: 'error' })
+		}
 
-			if (result) {
-				result.forEach(record => {
-					let roomNumber = record.id
+		if (result.length > 0) {
+			result.forEach(async record => {
+				let roomNumber = record.id
 
-					sql = `UPDATE rooms SET rooms.reserved='1' WHERE rooms.id = ${roomNumber};
-					INSERT INTO roomreservation (id, firstname, lastname, email, cnic, number, roomnumber, roomtype, numberofrooms, checkindate) values ('', '${fname}', '${lname}', '${email}', '${cnic}', '${number}', '${roomNumber}', '${roomType}', '${numberofrooms}', '${checkin}');`
+				try {
+					await RoomsTable.update({ reserved: '1' }, { where: { id: roomNumber } })
 
-					con.query(sql, (err, results) => {
-						if (err) return res.send({ msg: 'reservation error' })
-
-						if (results) return res.send({ msg: 'success' })
+					await RoomReservationTable.create({
+						firstname: fname,
+						lastname: lname,
+						email: email,
+						cnic: cnic,
+						number: number,
+						roomnumber: roomNumber,
+						roomtype: roomType,
+						numberofrooms: numberofrooms,
+						checkindate: checkin,
 					})
-				})
-			}
-		})
+				} catch (err) {
+					return res.send({ msg: 'reservation error' })
+				}
+			})
+
+			return res.send({ msg: 'success' })
+		} else {
+			return res.send({ msg: 'no rooms available' })
+		}
 	} else {
 		return res.send({ msg: 'error' })
 	}
 })
 
-app.get('/api/reservation', (req, res) => {
-	let sql = 'SELECT * FROM roomreservation'
-
-	con.query(sql, (err, result) => {
-		if (err) res.status(400).send(err)
+app.get('/api/reservation', async (req, res) => {
+	try {
+		let result = await RoomsReservationTable.findAll()
 
 		return res.send(result)
-	})
+	} catch (err) {
+		return res.status(400).send(err)
+	}
 })
 
-app.get('/api/addcheckin/:id', (req, res) => {
+app.get('/api/addcheckin/:id', async (req, res) => {
 	if (!req.params.id || req.params.id === '') return res.send({ msg: 'error' })
 
-	let sql = `SELECT * FROM roomreservation WHERE roomreservation.id = '${req.params.id}'`
-
-	con.query(sql, (err, result) => {
-		if (err) return res.send({ msg: 'error' })
+	try {
+		let result = await RoomsReservationTable.findAll({ where: { id: req.params.id } })
 
 		if (result && result.length > 0) {
 			const firstname = result[0].firstname
@@ -164,65 +181,56 @@ app.get('/api/addcheckin/:id', (req, res) => {
 
 			const time = `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`
 
-			sql = `INSERT INTO checkedin (id, firstname, lastname, email, cnic, number, roomnumber, roomtype, checkindate) 
-			VALUES ('', '${firstname}', '${lastname}','${email}','${cnic}','${number}','${roomnumber}','${roomType}','${time}')`
-
-			con.query(sql, (err1, result1) => {
-				if (err1) return res.send({ msg: 'error' })
-
-				if (result1) {
-					sql = `DELETE FROM roomreservation WHERE roomreservation.id = '${req.params.id}'`
-
-					con.query(sql, (err2, result2) => {
-						if (err2) return res.send({ msg: 'error' })
-
-						if (result2) {
-							sql = `UPDATE rooms SET rooms.checkedIn = '1', rooms.reserved = NULL WHERE rooms.id = '${roomnumber}'`
-
-							con.query(sql, (err3, result3) => {
-								if (err3) return res.send({ msg: 'error' })
-
-								if (result3) return res.send({ msg: 'success' })
-							})
-						}
-					})
-				}
+			await CheckedInTable.create({
+				firstname: firstname,
+				lastname: lastname,
+				email: email,
+				cnic: cnic,
+				number: number,
+				roomnumber: roomnumber,
+				roomtype: roomType,
+				checkindate: time,
 			})
-		} else {
-			return res.send({ msg: 'error' })
+
+			await RoomsReservationTable.destroy({ where: { id: req.params.id } })
+
+			await RoomsTable.update({ checkedIn: '1', reserved: null }, { where: { id: roomnumber } })
+
+			return res.send({ msg: 'success' })
 		}
-	})
+	} catch (err) {
+		return res.send({ msg: 'error' })
+	}
 })
 
-app.get('/api/deletecheckin/:id', (req, res) => {
+app.get('/api/deletecheckin/:id', async (req, res) => {
 	if (!req.params.id || req.params.id === '') return res.send({ msg: 'error' })
 
-	let sql = `DELETE FROM roomreservation WHERE roomreservation.id = '${req.params.id}'`
-
-	con.query(sql, (err, result) => {
-		if (err) return res.send({ msg: 'error' })
+	try {
+		await RoomsReservationTable.destroy({ where: { id: req.params.id } })
 
 		return res.send({ msg: 'success' })
-	})
+	} catch (err) {
+		return res.send({ msg: 'error' })
+	}
 })
 
-app.get('/api/getcheckin', (req, res) => {
-	let sql = 'SELECT * FROM checkedin ORDER BY checkedin.id DESC'
-
-	con.query(sql, (err, result) => {
-		if (err) res.status(400).send(err)
-
+app.get('/api/getcheckin', async (req, res) => {
+	try {
+		let result = await CheckedInTable.findAll({
+			order: [['id', 'DESC']],
+		})
 		return res.send(result)
-	})
+	} catch (err) {
+		return res.status(400).send(err)
+	}
 })
 
-app.get('/api/addcheckout/:id', (req, res) => {
+app.get('/api/addcheckout/:id', async (req, res) => {
 	if (!req.params.id || req.params.id === '') return res.send({ msg: 'error' })
 
-	let sql = `SELECT * FROM checkedin WHERE checkedin.id = '${req.params.id}'`
-
-	con.query(sql, (err, result) => {
-		if (err) return res.send({ msg: 'error' })
+	try {
+		let result = await CheckedInTable.findAll({ where: { id: req.params.id } })
 
 		if (result && result.length > 0) {
 			const firstname = result[0].firstname
@@ -239,44 +247,39 @@ app.get('/api/addcheckout/:id', (req, res) => {
 
 			const time = `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`
 
-			sql = `INSERT INTO checkout (id, firstname, lastname, email, cnic, number, roomnumber, roomtype, checkindate, checkoutdate) 
-			VALUES ('', '${firstname}', '${lastname}','${email}','${cnic}','${number}','${roomnumber}','${roomType}','${checkindate}','${time}')`
-
-			con.query(sql, (err1, result1) => {
-				if (err1) return res.send({ msg: 'error' })
-
-				if (result1) {
-					sql = `DELETE FROM checkedin WHERE checkedin.id = '${req.params.id}'`
-
-					con.query(sql, (err2, result2) => {
-						if (err2) return res.send({ msg: 'error' })
-
-						if (result2) {
-							sql = `UPDATE rooms SET rooms.checkedIn = NULL WHERE rooms.id = '${roomnumber}'`
-
-							con.query(sql, (err3, result3) => {
-								if (err3) return res.send({ msg: 'error' })
-
-								if (result3) return res.send({ msg: 'success' })
-							})
-						}
-					})
-				}
+			await CheckedOutTable.create({
+				firstname: firstname,
+				lastname: lastname,
+				email: email,
+				cnic: cnic,
+				number: number,
+				roomnumber: roomnumber,
+				roomtype: roomType,
+				checkindate: checkindate,
+				checkoutdate: time,
 			})
-		} else {
-			res.send({ msg: 'error' })
+
+			await CheckedInTable.destroy({ where: { id: req.params.id } })
+
+			await RoomsTable.update({ checkedIn: null }, { where: { id: roomnumber } })
+
+			return res.send({ msg: 'success' })
 		}
-	})
+	} catch (err) {
+		return res.send({ msg: 'error' })
+	}
 })
 
-app.get('/api/getcheckout', (req, res) => {
-	let sql = 'SELECT * FROM checkout ORDER BY checkout.id DESC'
-
-	con.query(sql, (err, result) => {
-		if (err) res.status(400).send(err)
+app.get('/api/getcheckout', async (req, res) => {
+	try {
+		let result = await CheckedOutTable.findAll({
+			order: [['id', 'DESC']],
+		})
 
 		return res.send(result)
-	})
+	} catch (err) {
+		return res.status(400).send(err)
+	}
 })
 
 app.listen(5000, () => console.log('server connected'))
