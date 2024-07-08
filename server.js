@@ -32,12 +32,22 @@ app.get('/', (req, res) => {
 	return res.send('Server is running')
 })
 
+app.get('/api/users', async (req, res) => {
+	try {
+		const users = await UserTable.findAll()
+
+		return res.send(users)
+	} catch (err) {
+		return res.send({ msg: 'error' })
+	}
+})
+
 app.get('/api/login/:username/:password', async (req, res) => {
 	let username = req.params.username
 	let pass = req.params.password
 
 	try {
-		const user = UserTable.findOne({ username: username, password: pass })
+		const user = await UserTable.findOne({ where: { username: username, password: pass } })
 
 		if (!user) return res.send({ msg: 'user not found' })
 
@@ -112,21 +122,26 @@ app.get('/api/addReservation/:fn/:ln/:e/:cnic/:num/:rt/:nr/:checkin', async (req
 
 		try {
 			result = await RoomsTable.findAll({
-				limit: numberofrooms,
 				where: { reserved: null, checkedIn: null, type: roomType },
+				limit: parseInt(numberofrooms),
 			})
 		} catch (err) {
+			console.log(err)
 			return res.send({ msg: 'error' })
 		}
 
 		if (result.length > 0) {
-			result.forEach(async record => {
-				let roomNumber = record.id
+			for (let i = 0; i < result.length; i++) {
+				const record = result[i]
+
+				let roomNumber = record.dataValues['id']
+
+				console.log('room numberL: ', roomNumber)
 
 				try {
 					await RoomsTable.update({ reserved: '1' }, { where: { id: roomNumber } })
 
-					await RoomReservationTable.create({
+					await RoomsReservationTable.create({
 						firstname: fname,
 						lastname: lname,
 						email: email,
@@ -138,9 +153,10 @@ app.get('/api/addReservation/:fn/:ln/:e/:cnic/:num/:rt/:nr/:checkin', async (req
 						checkindate: checkin,
 					})
 				} catch (err) {
+					console.log(err)
 					return res.send({ msg: 'reservation error' })
 				}
-			})
+			}
 
 			return res.send({ msg: 'success' })
 		} else {

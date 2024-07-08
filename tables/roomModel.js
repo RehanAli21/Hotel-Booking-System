@@ -33,7 +33,7 @@ const RoomReservation = (sequelize, DataTypes) => {
 			type: DataTypes.STRING,
 			allowNull: false,
 		},
-		roomofrooms: {
+		numberofrooms: {
 			type: DataTypes.INTEGER,
 			allowNull: false,
 		},
@@ -55,7 +55,7 @@ const RoomReservation = (sequelize, DataTypes) => {
 	return model
 }
 
-const Rooms = async (sequelize, DataTypes) => {
+const Rooms = (sequelize, DataTypes) => {
 	let model = sequelize.define('rooms', {
 		id: {
 			type: DataTypes.INTEGER,
@@ -89,22 +89,23 @@ const Rooms = async (sequelize, DataTypes) => {
 			console.error('Unable to create table : ', error)
 		})
 
-	let res = await model.findAll()
+	// run it when running project first time to insert rooms data table
+	// let res = await model.findAll()
 
-	if (res.length !== 86) {
-		let data = [
-			['deluxe', 25000, 12],
-			['luxury', 15000, 20],
-			['guest', 10000, 24],
-			['single', 5000, 30],
-		]
+	// if (res.length !== 86) {
+	// 	let data = [
+	// 		['deluxe', 25000, 12],
+	// 		['luxury', 15000, 20],
+	// 		['guest', 10000, 24],
+	// 		['single', 5000, 30],
+	// 	]
 
-		for (let e in data) {
-			for (let i = 0; i < data[e][2]; i++) {
-				model.create({ type: data[e][0], price: data[e][1] })
-			}
-		}
-	}
+	// 	for (let e in data) {
+	// 		for (let i = 0; i < data[e][2]; i++) {
+	// 			model.create({ type: data[e][0], price: data[e][1] })
+	// 		}
+	// 	}
+	// }
 
 	return model
 }
