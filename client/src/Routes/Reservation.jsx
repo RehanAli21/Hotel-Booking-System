@@ -42,6 +42,7 @@ const Reservation = () => {
 					`http://localhost:5000/api/addReservation/${firstname}/${lastname}/${email}/${cnic}/${number}/${roomtype}/${numberofrooms}/${checkin}`
 				)
 				.then(res => {
+					console.log(res)
 					if (res.data.msg === 'reservation error') setMsg(['Reservation failed', 1])
 					else if (res.data.msg === 'success') setMsg(['Reservation successfull', 0])
 					else setMsg(['Server Error', 1])

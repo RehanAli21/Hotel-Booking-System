@@ -23,6 +23,7 @@ const Login = () => {
 				}
 
 				if (res.data.successMsg && res.data.successMsg === 'user found') {
+					console.log(res.data)
 					setUser(usernameRef.current.value, res.data.usertype)
 
 					navigate('/admin/dashboard/' + usernameRef.current.value)

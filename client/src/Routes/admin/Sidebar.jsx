@@ -8,6 +8,8 @@ const SideBar = ({ userType, navigate, resetUser, page, username }) => {
 		navigate('/admin')
 	}
 
+	console.log(userType)
+
 	return (
 		<div className='col-2 mysidebar bg-dark text-white pt-3' style={{ height: '100vh' }}>
 			{userType === 'admin' ? (

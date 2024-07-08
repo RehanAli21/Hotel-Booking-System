@@ -40,14 +40,15 @@ const Users = () => {
 		axios
 			.get('http://localhost:5000/api/users')
 			.then(res => {
+				console.log(res)
 				let num = 1
 				res.data.forEach(record => {
 					newRows.push(
 						<tr key={record.id}>
 							<td scope='col'>{num}</td>
-							<td scope='col'>{record.name}</td>
-							<td scope='col'>{record.pass}</td>
-							<td scope='col'>{record.admin === 1 ? 'Administration' : 'Normal'}</td>
+							<td scope='col'>{record.username}</td>
+							<td scope='col'>{record.password}</td>
+							<td scope='col'>{record.admin === 2 ? 'Normal' : 'Administration'}</td>
 							<td scope='col'>
 								<button className='btn btn-danger' onClick={() => deleteUser(record.id)}>
 									<i className='fa fa-trash me-2'></i>Delete
